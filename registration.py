@@ -1,5 +1,4 @@
 from patient import Patient
-from hash_table import HashTable
 
 next_patient_id = 1         # module-level counter, resets to 1 on every start so will be replaced by SQLite later
 

@@ -21,3 +21,10 @@ class HashTable:
             if patient.phone == key:          # patient.phone is the stored key - checking if it matches
                 return patient      # patient is the whole object - if matches return it
         return None
+
+    def get_all_patients(self):
+        all_patients = []
+        for slot in self.table:               # going through each slot
+            for patient in slot:              # going through every patient in that slot 
+                all_patients.append(patient)
+        return all_patients
