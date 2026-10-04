@@ -29,7 +29,9 @@ def create_tables():
             classification TEXT,
             test_date TEXT NOT NULL,
             next_due_date TEXT,
-            FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+            entered_by TEXT,
+            FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+            FOREIGN KEY (entered_by) REFERENCES staff(staff_id)
         )
     """)
     cursor.execute(
@@ -57,15 +59,15 @@ def save_patient(patient):      # saving the data of patient - inserting one new
     conn.commit()
     conn.close()
 
-def save_test(test, patient_id):    # saving the data about test - inserting one new row into tests table
+def save_test(test, patient_id, entered_by):    # saving the data about test - inserting one new row into tests table
     conn = sqlite3.connect("hashlab.db")
     cursor = conn.cursor()
 
     # we do not include test_id here - because it is integer so we can just AUTOINCREMENT - SQLite will assign the number automatically
 
     cursor.execute(
-        "INSERT INTO tests (patient_id, test_type, result, classification, test_date, next_due_date) VALUES (?,?,?,?,?,?)",
-        (patient_id, test.test_type, test.result_value, test.classification, test.test_date, test.next_due_date)
+        "INSERT INTO tests (patient_id, test_type, result, classification, test_date, next_due_date, entered_by) VALUES (?,?,?,?,?,?,?)",
+        (patient_id, test.test_type, test.result_value, test.classification, test.test_date, test.next_due_date, entered_by)
     )
     conn.commit()
     conn.close()
