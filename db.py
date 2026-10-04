@@ -32,6 +32,14 @@ def create_tables():
             FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
         )
     """)
+    cursor.execute(
+        """ CREATE TABLE IF NOT EXISTS staff (
+                staff_id TEXT PRIMARY KEY,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL, 
+                role TEXT NOT NULL
+        )
+    """)
 
     conn.commit()       # saves the changes permanently to hashlab.db
     conn.close()        # closes the connection
@@ -61,6 +69,27 @@ def save_test(test, patient_id):    # saving the data about test - inserting one
     )
     conn.commit()
     conn.close()
+
+def save_staff(staff):              # saving the data about staff memmbers 
+    conn = sqlite3.connect("hashlab.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO staff (staff_id, username, password_hash, role) VALUES (?,?,?,?)",
+        (staff.staff_id, staff.username, staff.password_hash, staff.role) 
+    )
+    conn.commit()
+    conn.close()
+
+def get_staff_by_username(username):    # this actually the similar process happened inn the HashTable while searching for patients. Now, we are searching for staff members with their username - because they enter only their username and passwords in the login screen. So, we find the data about the staff member from the entered username
+    conn = sqlite3.connect("hashlab.db")
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT staff_id, username, password_hash, role FROM staff WHERE username = ?",
+        (username,)
+    )
+    row = cursor.fetchone()             # as we have UNIQUE username fetchone - not fetchall()
+    conn.close()
+    return row
 
 def update_patient(patient):    # updates an existing patient's saved data - save_patient() - only INSERT new rows, so after visit_count changes - this function would write the change back to the database 
     conn = sqlite3.connect("hashlab.db")
