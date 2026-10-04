@@ -1,12 +1,15 @@
 from patient import Patient
 from datetime import date
-next_patient_id = 1         # module-level counter, resets to 1 on every start so will be replaced by SQLite later
+import sqlite3
+from db import save_patient
 
 def generate_patient_id():
-    global next_patient_id
-    new_id = "P" + str(next_patient_id).zfill(3)        # for example, 1-> "P001"
-    next_patient_id += 1
-    return new_id
+    conn = sqlite3.connect("hashlab.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM patients")     # so everytime when code runs, it will continue to generate the ID from the leftover ID. For ex, code stopped after creating P003, when it runs again it will continue to generate from  P004
+    count = cursor.fetchone()[0]
+    conn.close()
+    return "P" + str(count + 1).zfill(3)                # For example, P001
 
 def register_patient(name, surname, phone, hash_table):
     if not name or not surname or not phone:
@@ -22,4 +25,5 @@ def register_patient(name, surname, phone, hash_table):
     new_id = generate_patient_id()
     new_patient = Patient(new_id, name, surname, phone, date.today())  # create and store the new patient, records today's date as registration date - for report generation
     hash_table.insert(new_patient)
+    save_patient(new_patient)
     return new_patient
