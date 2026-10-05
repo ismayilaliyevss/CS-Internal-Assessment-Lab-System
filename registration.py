@@ -12,11 +12,20 @@ def generate_patient_id():
     return "P" + str(count + 1).zfill(3)                # For example, P001
 
 def register_patient(name, surname, phone, hash_table):
+    name = name.strip().title()                         # strip is for removing accidental spaces, title() is for capitalizing the first letter and decapitalizing other letters
+    surname = surname.strip().title()
+    phone = phone.strip()
     if not name or not surname or not phone:
         return "Error: all fields are required"         # checking if all fields filled
 
+    if any(char.isdigit() for char in name) or any(char.isdigit() for char in surname):     # checks if there is any digit in surname or name
+        return "Error: name and/or surname cannot contain numbers"
+
     if not phone.isdigit() or len(phone) != 10:
         return "Error: invalid phone number format"     # checking if phone format is valid? (should be 10 digit)
+
+    if len(name) < 3 or len(surname) < 3:           # checking if name or surname atleast 3 characters
+        return f"Error: name and surname must be at least 3 characters"
 
     existing = hash_table.search(phone)                 # checking if already exists? - using search() from hash_table.py 
     if existing is not None:
