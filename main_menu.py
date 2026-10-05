@@ -1,5 +1,8 @@
 import tkinter as tk
 from register_patient_window import open_register_patient_window
+from search_patient_window import open_search_patient_window
+from enter_test_window import open_enter_test_window
+from follow_up_window import open_follow_up_window
 
 LABEL_FONT = ("Arial", 13)          # firstly, I was writing them by hand each time, but whenever I tried to change it - it became so hard to change for each text, so I just created variables - make it easier to modify
 BUTTON_FONT = ("Arial", 12)
@@ -12,22 +15,35 @@ def open_main_menu(staff, hash_table):          # staff is just StuffMember obje
 
     tk.Label(window, text = f"Logged in as: {staff.username} ({staff.staff_id}) - {staff.role}", font = LABEL_FONT).pack(pady=(20,15))
 
+    def back_to_this_menu(staff):           # I am doing the same thing I did in main.py, as register passes only staff we are adding hash_table also
+        open_main_menu(staff, hash_table)
+
     def go_to_register(staff):
         window.destroy()
-        def back_to_this_menu(staff):           # I am doing the same thing I did in main.py, as register passes only staff we are adding hash_table also
-             open_main_menu(staff, hash_table)
         open_register_patient_window(staff, hash_table, back_to_this_menu)
 
+    def go_to_search(staff):
+         window.destroy()
+         open_search_patient_window(staff, hash_table, back_to_this_menu)
+
+    def go_to_enter_test(staff):
+        window.destroy()  
+        open_enter_test_window(staff, hash_table, back_to_this_menu)
+
+    def go_to_follow_up(staff):
+         window.destroy()
+         open_follow_up_window(staff, hash_table, back_to_this_menu)
+    
     if staff.role == "Technician":
         tk.Button(window, text = "Register Patient", command = lambda: go_to_register(staff), width=25, font = BUTTON_FONT).pack(pady=7)     # Register Patient - it is for only Technician
 
 
-    tk.Button(window, text = "Search / Edit Patient", width=25, font = BUTTON_FONT).pack(pady=7)    # Search / Edit Patient - is visible for both roles
+    tk.Button(window, text = "Search / Edit Patient", command = lambda: go_to_search(staff), width=25, font = BUTTON_FONT).pack(pady=7)    # Search / Edit Patient - is visible for both roles
 
     if staff.role == "Doctor":
-            tk.Button(window, text = "Enter Test Result", width=25, font = BUTTON_FONT).pack(pady=7)     # Enter Test Result - it is for only Doctor
+            tk.Button(window, text = "Enter Test Result", command = lambda: go_to_enter_test(staff), width=25, font = BUTTON_FONT).pack(pady=7)     # Enter Test Result - it is for only Doctor
 
-    tk.Button(window, text="Follow-Up Schedule", width=25, font = BUTTON_FONT).pack(pady=7)              # Follow-Up Schedule - is visible for both roles
+    tk.Button(window, text="Follow-Up Schedule",command=lambda: go_to_follow_up(staff), width=25, font = BUTTON_FONT).pack(pady=7)              # Follow-Up Schedule - is visible for both roles
 
     if staff.role == "Technician":
             tk.Button(window, text = "Generate Report", width=25, font = BUTTON_FONT).pack(pady=7)     # Generate Report - it is for only Technician

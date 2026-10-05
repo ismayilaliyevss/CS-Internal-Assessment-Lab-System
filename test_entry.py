@@ -1,18 +1,21 @@
 from test import Test
 from db import save_test, update_patient
 
-def enter_test_result(phone, test_type, result_value, test_date, hash_table):
+def enter_test_result(phone, test_type, result_value, test_date, hash_table, entered_by):       # entered_by - staff_id of the logged-in doctor
     patient = hash_table.search(phone)              #finding the patient first, reusing search()
     if patient is None:
         return "Error: patient not found"
 
+    if test_date < patient.registered_date:
+        return "Error: test date is before the patient was registered"
+    
     new_test = Test(test_type, result_value, test_date)     # creating the Test object and using its two methods
     new_test.classify()                                     # first method - classify()
     new_test.calculate_due_date()                           # second method - calculate_due_date()
 
     patient.add_test(new_test)                              # attaching it to the patient
 
-    save_test(new_test, patient.patient_id)                 # save this test to the database - otherwise it would only exist in memory until the system shutted down
+    save_test(new_test, patient.patient_id, entered_by)                 # save this test to the database - otherwise it would only exist in memory until the system shutted down
 
     same_day_test_exists = False                            # only count a new visit if no earlier test already happened on this same date
     for existing_test in patient.tests[:-1]:                # excluding the test we just added
